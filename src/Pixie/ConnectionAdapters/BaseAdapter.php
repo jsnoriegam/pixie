@@ -1,6 +1,6 @@
 <?php namespace Pixie\ConnectionAdapters;
 
-use Viocon\Container;
+use Pixie\DI\Container;
 
 abstract class BaseAdapter
 {

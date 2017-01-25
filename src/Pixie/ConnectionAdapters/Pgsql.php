@@ -16,7 +16,7 @@ class Pgsql extends BaseAdapter
         }
 
         $connection = $this->container->build(
-            '\PDO',
+            \PDO::class,
             array($connectionString, $config['username'], $config['password'], $config['options'])
         );
 

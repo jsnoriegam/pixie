@@ -797,7 +797,7 @@ class QueryBuilderHandler
 
         // Build a new JoinBuilder class, keep it by reference so any changes made
         // in the closure should reflect here
-        $joinBuilder = $this->container->build('\Pixie\QueryBuilder\JoinBuilder', array($this->connection));
+        $joinBuilder = $this->container->build(\Pixie\QueryBuilder\JoinBuilder::class, array($this->connection));
         $joinBuilder = &$joinBuilder;
 
         // Call the closure with our new joinBuilder object
@@ -823,7 +823,7 @@ class QueryBuilderHandler
             $this->pdo->beginTransaction();
 
             // Get the Transaction class
-            $transaction = $this->container->build('\Pixie\QueryBuilder\Transaction', array($this->connection));
+            $transaction = $this->container->build(\Pixie\QueryBuilder\Transaction::class, array($this->connection));
 
             // Call closure
             $callback($transaction);
@@ -892,7 +892,7 @@ class QueryBuilderHandler
      */
     public function raw($value, $bindings = array())
     {
-        return $this->container->build('\Pixie\QueryBuilder\Raw', array($value, $bindings));
+        return $this->container->build(\Pixie\QueryBuilder\Raw::class, array($value, $bindings));
     }
 
     /**

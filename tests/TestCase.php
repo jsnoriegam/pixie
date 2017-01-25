@@ -1,7 +1,7 @@
 <?php namespace Pixie;
 
 use Mockery as m;
-use Viocon\Container;
+use Pixie\DI\Container;
 
 class TestCase extends \PHPUnit_Framework_TestCase {
     /**
@@ -16,7 +16,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
     {
         $this->container = new Container();
 
-        $this->mockPdoStatement = $this->getMock('\\PDOStatement');
+        $this->mockPdoStatement = $this->createMock('\\PDOStatement');
 
         $mockPdoStatement = & $this->mockPdoStatement;
 
@@ -46,7 +46,7 @@ class TestCase extends \PHPUnit_Framework_TestCase {
                 return array($mockPdoStatement->sql, $mockPdoStatement->bindings);
             }));
 
-        $this->mockPdo = $this->getMock('\\Pixie\\MockPdo', array('prepare', 'setAttribute', 'quote', 'lastInsertId'));
+        $this->mockPdo = $this->createMock('\\Pixie\\MockPdo', array('prepare', 'setAttribute', 'quote', 'lastInsertId'));
 
         $this->mockPdo
             ->expects($this->any())

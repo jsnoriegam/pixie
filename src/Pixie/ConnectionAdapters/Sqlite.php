@@ -11,7 +11,7 @@ class Sqlite extends BaseAdapter
     {
         $connectionString = 'sqlite:' . $config['database'];
         return $this->container->build(
-            '\PDO',
+            \PDO::class,
             array($connectionString, null, null, $config['options'])
         );
     }

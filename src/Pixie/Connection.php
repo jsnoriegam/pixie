@@ -1,6 +1,6 @@
 <?php namespace Pixie;
 
-use Viocon\Container;
+use Pixie\DI\Container;
 
 class Connection
 {
@@ -41,32 +41,16 @@ class Connection
      * @param null|string   $alias
      * @param Container     $container
      */
-    public function __construct($adapter, array $adapterConfig, $alias = null, Container $container = null)
+    public function __construct(array $adapterConfig, Container $container = null)
     {
         $container = $container ? : new Container();
 
         $this->container = $container;
 
-        $this->setAdapter($adapter)->setAdapterConfig($adapterConfig)->connect();
+        $this->setAdapter($adapterConfig['driver'])->setAdapterConfig($adapterConfig)->connect();
 
         // Create event dependency
-        $this->eventHandler = $this->container->build('\Pixie\EventHandler');
-
-        if ($alias) {
-            $this->createAlias($alias);
-        }
-    }
-
-    /**
-     * Create an easily accessible query builder alias
-     *
-     * @param $alias
-     */
-    public function createAlias($alias)
-    {
-        class_alias('Pixie\AliasFacade', $alias);
-        $builder = $this->container->build('\Pixie\QueryBuilder\QueryBuilderHandler', array($this));
-        AliasFacade::setQueryBuilderInstance($builder);
+        $this->eventHandler = $this->container->build(\Pixie\EventHandler::class);
     }
 
     /**
@@ -74,7 +58,7 @@ class Connection
      */
     public function getQueryBuilder()
     {
-        return $this->container->build('\Pixie\QueryBuilder\QueryBuilderHandler', array($this));
+        return $this->container->build(\Pixie\QueryBuilder\QueryBuilderHandler::class, array($this));
     }
 
 

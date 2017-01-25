@@ -378,11 +378,11 @@ abstract class BaseAdapter
                 // Build a new NestedCriteria class, keep it by reference so any changes made
                 // in the closure should reflect here
                 $nestedCriteria = $this->container->build(
-                    '\Pixie\QueryBuilder\NestedCriteria',
+                    \Pixie\QueryBuilder\NestedCriteria::class,
                     array($this->connection)
                 );
 
-                $nestedCriteria = &$nestedCriteria;
+                $nestedCriteria =& $nestedCriteria;
 
                 // Call the closure with our new nestedCriteria object
                 $key($nestedCriteria);
