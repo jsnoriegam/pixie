@@ -1,5 +1,5 @@
-# Pixie Query Builder
-A lightweight, expressive, framework agnostic query builder for PHP it can also be referred as a Database Abstraction Layer. Pixie supports MySQL, SQLite and PostgreSQL and it takes care of query sanitization, table prefixing and many other things with a unified API. At least PHP 5.3 is required.
+# Pixie Query Builder [![Build Status](https://travis-ci.org/jsnoriegam/pixie.svg?branch=master)](https://travis-ci.org/jsnoriegam/pixie)
+A lightweight, expressive, framework agnostic query builder for PHP it can also be referred as a Database Abstraction Layer. Pixie supports MySQL, SQLite and PostgreSQL and it takes care of query sanitization, table prefixing and many other things with a unified API. At least PHP 5.5 is required.
 
 ## NOTE
 This forked version aims to deploy pull-requests and fix bugs quicker.
@@ -35,7 +35,7 @@ $config = array(
             ),
         );
 
-new \Pixie\Connection($config);
+$connection = new \Pixie\Connection($config);
 ```
 
 **Simple Query:**
@@ -87,7 +87,6 @@ Library on [Packagist](https://packagist.org/packages/usmanhalalit/pixie).
 ### Table of Contents
 
  - [Connection](#connection)
-    - [Alias](#alias)
     - [Multiple Connection](#alias)
     - [SQLite and PostgreSQL Config Sample](sqlite-and-postgresql-config-sample)
  - [Query](#query)
@@ -159,23 +158,23 @@ $query = $qb->table('my_table')->where('name', '=', 'Sana');
 ### SQLite and PostgreSQL Config Sample
 ```PHP
 $connection = new \Pixie\Connection(array(
-                'driver'   => 'sqlite',
-			    'database' => 'your-file.sqlite',
-			    'prefix'   => 'cb_',
-		    ));
+        'driver'   => 'sqlite',
+        'database' => 'your-file.sqlite',
+        'prefix'   => 'cb_',
+));
 ```
 
 ```PHP
 $connection = new \Pixie\Connection(array(
-                    'driver'   => 'pgsql',
-                    'host'     => 'localhost',
-                    'database' => 'your-database',
-                    'username' => 'postgres',
-                    'password' => 'your-password',
-                    'charset'  => 'utf8',
-                    'prefix'   => 'cb_',
-                    'schema'   => 'public',
-                ));
+        'driver'   => 'pgsql',
+        'host'     => 'localhost',
+        'database' => 'your-database',
+        'username' => 'postgres',
+        'password' => 'your-password',
+        'charset'  => 'utf8',
+        'prefix'   => 'cb_',
+        'schema'   => 'public',
+));
 ```
 
 ## Query
@@ -277,13 +276,11 @@ $qb->table('my_table')
 ```PHP
 $qb->table('my_table')
     ->whereIn('name', array('usman', 'sana'))
-    ->orWhereIn('name', array('heera', 'dalim'))
-    ;
+    ->orWhereIn('name', array('heera', 'dalim'));
 
 $qb->table('my_table')
     ->whereNotIn('name', array('heera', 'dalim'))
-    ->orWhereNotIn('name', array('usman', 'sana'))
-    ;
+    ->orWhereNotIn('name', array('usman', 'sana'));
 ```
 
 #### Where Between
