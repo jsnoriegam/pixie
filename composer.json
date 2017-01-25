@@ -1,8 +1,8 @@
 {
-  "name": "jsnoriegam/pixie",
+  "name": "latinosoft/pixie",
   "version": "2.0",
   "description": "A lightweight, expressive, framework agnostic query builder for PHP. Personal fork.",
-  "homepage": "https://github.com/skipperbent/pixie",
+  "homepage": "https://github.com/jsnoriegam/pixie",
   "keywords": [
     "query builder",
     "sql",
@@ -12,7 +12,6 @@
     "sqlite"
   ],
   "license": "MIT",
-  "minimum-stability": "dev",
   "authors": [
     {
       "name": "Muhammad Usman",
@@ -36,11 +35,10 @@
     }
   ],
   "require": {
-    "php": ">=5.5.0",
-    "pimple/pimple": "^3.0"
+    "php": ">=5.5.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^4.8",
+    "phpunit/phpunit": "^5.7",
     "mockery/mockery": "0.9.4"
   },
   "autoload": {

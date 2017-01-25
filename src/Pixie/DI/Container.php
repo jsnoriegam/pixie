@@ -1,8 +1,12 @@
 <?php namespace Pixie\DI;
 
-use Pimple\Container as PimpleContainer;
+class Container {
 
-class Container extends PimpleContainer {
+    /**
+    * 
+    */
+    private $instances = [];
+
     /**
      * Register or replace an instance as a singleton.
      * Useful for replacing with Mocked instance
@@ -13,7 +17,7 @@ class Container extends PimpleContainer {
      * @return void
      */
     public function setInstance($key, $value) {
-        $this[$key] = $value;
+        $this->instances[$key] = $value;
     }
 
     /**
@@ -25,8 +29,8 @@ class Container extends PimpleContainer {
      */
     public function build($key, $args = []) {
         // If we have a instance registered then just return it
-        if($this->offsetExists($key)) {
-            return $this[$key];
+        if(array_key_exists($key, $this->instances)) {
+            return $this->instances[$key];
         } else {
             // If we don't have a registered object with the key then assume user
             // is trying to build a class with the given key/name

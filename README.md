@@ -1,4 +1,4 @@
-# Pixie Query Builder [![Build Status](https://travis-ci.org/usmanhalalit/pixie.png?branch=master)](https://travis-ci.org/usmanhalalit/pixie)
+# Pixie Query Builder
 A lightweight, expressive, framework agnostic query builder for PHP it can also be referred as a Database Abstraction Layer. Pixie supports MySQL, SQLite and PostgreSQL and it takes care of query sanitization, table prefixing and many other things with a unified API. At least PHP 5.3 is required.
 
 ## NOTE
@@ -35,20 +35,20 @@ $config = array(
             ),
         );
 
-new \Pixie\Connection('mysql', $config, 'QB');
+new \Pixie\Connection($config);
 ```
 
 **Simple Query:**
 
 The query below returns the row where id = 3, null if no rows.
 ```PHP
-$row = QB::table('my_table')->find(3);
+$row = $qb->table('my_table')->find(3);
 ```
 
 **Full Queries:**
 
 ```PHP
-$query = QB::table('my_table')->where('name', '=', 'Sana');
+$query = $qb->table('my_table')->where('name', '=', 'Sana');
 
 // Get result
 $query->get();
@@ -59,7 +59,7 @@ $query->get();
 After the code below, every time a select query occurs on `users` table, it will add this where criteria, so banned users don't get access.
 
 ```PHP
-QB::registerEvent('before-select', 'users', function($qb)
+$qb->registerEvent('before-select', 'users', function($qb)
 {
     $qb->where('status', '!=', 'banned');
 });
@@ -137,7 +137,7 @@ Pixie supports three database drivers, MySQL, SQLite and PostgreSQL. You can spe
 require 'vendor/autoload.php';
 
 $config = array(
-            'driver'    => 'mysql', // Db driver
+            'driver'    => 'mysql', // Db driver/adapter
             'host'      => 'localhost',
             'database'  => 'your-database',
             'username'  => 'root',
@@ -147,43 +147,26 @@ $config = array(
             'prefix'    => 'cb_', // Table prefix, optional
         );
 
-new \Pixie\Connection('mysql', $config, 'QB');
+new \Pixie\Connection($config);
 
-// Run query
-$query = QB::table('my_table')->where('name', '=', 'Sana');
-```
-
-### Alias
-When you create a connection:
-```PHP
-new \Pixie\Connection('mysql', $config, 'MyAlias');
-```
-`MyAlias` is the name for the class alias you want to use (like `MyAlias::table(...)`), you can use whatever name (with Namespace also, `MyNamespace\\MyClass`) you like or you may skip it if you don't need an alias. Alias gives you the ability to easily access the QueryBuilder class across your application.
-
-When not using an alias you can instantiate the QueryBuilder handler separately, helpful for Dependency Injection and Testing.
-
-```PHP
-$connection = new \Pixie\Connection('mysql', $config));
+//$connection here is optional, if not given it will always associate itself to the first connection, but it can be useful when you have multiple database connections.
 $qb = new \Pixie\QueryBuilder\QueryBuilderHandler($connection);
 
+// Run query
 $query = $qb->table('my_table')->where('name', '=', 'Sana');
-
-var_dump($query->get());
 ```
-
-`$connection` here is optional, if not given it will always associate itself to the first connection, but it can be useful when you have multiple database connections.
 
 ### SQLite and PostgreSQL Config Sample
 ```PHP
-new \Pixie\Connection('sqlite', array(
+$connection = new \Pixie\Connection(array(
                 'driver'   => 'sqlite',
 			    'database' => 'your-file.sqlite',
 			    'prefix'   => 'cb_',
-		    ), 'QB');
+		    ));
 ```
 
 ```PHP
-new \Pixie\Connection('pgsql', array(
+$connection = new \Pixie\Connection(array(
                     'driver'   => 'pgsql',
                     'host'     => 'localhost',
                     'database' => 'your-database',
@@ -192,33 +175,33 @@ new \Pixie\Connection('pgsql', array(
                     'charset'  => 'utf8',
                     'prefix'   => 'cb_',
                     'schema'   => 'public',
-                ), 'QB');
+                ));
 ```
 
 ## Query
 You **must** use `table()` method before every query, except raw `query()`.
 To select from multiple tables just pass an array.
 ```PHP
-QB::table(array('mytable1', 'mytable2'));
+$qb->table(array('mytable1', 'mytable2'));
 ```
 
 
 ### Get Easily
 The query below returns the (first) row where id = 3, null if no rows.
 ```PHP
-$row = QB::table('my_table')->find(3);
+$row = $qb->table('my_table')->find(3);
 ```
-Access your row like, `echo $row->name`. If your field name is not `id` then pass the field name as second parameter `QB::table('my_table')->find(3, 'person_id');`.
+Access your row like, `echo $row->name`. If your field name is not `id` then pass the field name as second parameter `$qb->table('my_table')->find(3, 'person_id');`.
 
 The query below returns the all rows where name = 'Sana', null if no rows.
 ```PHP
-$result = QB::table('my_table')->findAll('name', 'Sana');
+$result = $qb->table('my_table')->findAll('name', 'Sana');
 ```
 
 
 ### Select
 ```PHP
-$query = QB::table('my_table')->select('*');
+$query = $qb->table('my_table')->select('*');
 ```
 
 #### Multiple Selects
@@ -238,7 +221,7 @@ Using select method multiple times `select('a')->select('b')` will also select `
 #### Get All
 Return an array.
 ```PHP
-$query = QB::table('my_table')->where('name', '=', 'Sana');
+$query = $qb->table('my_table')->where('name', '=', 'Sana');
 $result = $query->get();
 ```
 You can loop through it like:
@@ -250,7 +233,7 @@ foreach ($result as $row) {
 
 #### Get First Row
 ```PHP
-$query = QB::table('my_table')->where('name', '=', 'Sana');
+$query = $qb->table('my_table')->where('name', '=', 'Sana');
 $row = $query->first();
 ```
 Returns the first row, or null if there is no record. Using this method you can also make sure if a record exists. Access these like `echo $row->name`.
@@ -258,7 +241,7 @@ Returns the first row, or null if there is no record. Using this method you can 
 
 #### Get Rows Count
 ```PHP
-$query = QB::table('my_table')->where('name', '=', 'Sana');
+$query = $qb->table('my_table')->where('name', '=', 'Sana');
 $query->count();
 ```
 
@@ -281,7 +264,7 @@ SELECT (SELECT COUNT(*) FROM `cb_mail`) as row1, (SELECT COUNT(*) FROM `cb_event
 Basic syntax is `(fieldname, operator, value)`, if you give two parameters then `=` operator is assumed. So `where('name', 'usman')` and `where('name', '=', 'usman')` is the same.
 
 ```PHP
-QB::table('my_table')
+$qb->table('my_table')
     ->where('name', '=', 'usman')
     ->whereNot('age', '>', 25)
     ->orWhere('type', '=', 'admin')
@@ -292,12 +275,12 @@ QB::table('my_table')
 
 #### Where In
 ```PHP
-QB::table('my_table')
+$qb->table('my_table')
     ->whereIn('name', array('usman', 'sana'))
     ->orWhereIn('name', array('heera', 'dalim'))
     ;
 
-QB::table('my_table')
+$qb->table('my_table')
     ->whereNotIn('name', array('heera', 'dalim'))
     ->orWhereNotIn('name', array('usman', 'sana'))
     ;
@@ -305,14 +288,14 @@ QB::table('my_table')
 
 #### Where Between
 ```PHP
-QB::table('my_table')
+$qb->table('my_table')
     ->whereBetween('id', 10, 100)
     ->orWhereBetween('status', 5, 8);
 ```
 
 #### Where Null
 ```PHP
-QB::table('my_table')
+$qb->table('my_table')
     ->whereNull('modified')
     ->orWhereNull('field2')
     ->whereNotNull('field3')
@@ -324,7 +307,7 @@ Sometimes queries get complex, where you need grouped criteria, for example `WHE
 
 Pixie allows you to do so, you can nest as many closures as you need, like below.
 ```PHP
-QB::table('my_table')
+$qb->table('my_table')
             ->where('my_table.age', 10)
             ->where(function($q)
                 {
@@ -336,7 +319,7 @@ QB::table('my_table')
 
 ### Group By and Order By
 ```PHP
-$query = QB::table('my_table')->groupBy('age')->orderBy('created_at', 'ASC');
+$query = $qb->table('my_table')->groupBy('age')->orderBy('created_at', 'ASC');
 ```
 
 #### Multiple Group By
@@ -363,7 +346,7 @@ Using `groupBy()` or `orderBy()` methods multiple times `groupBy('a')->groupBy('
 
 ### Join
 ```PHP
-QB::table('my_table')
+$qb->table('my_table')
     ->join('another_table', 'another_table.person_id', '=', 'my_table.id')
 
 ```
@@ -387,31 +370,31 @@ If you need more than one criterion to join a table then pass a closure as secon
     {
         $table->on('another_table.person_id', '=', 'my_table.id');
         $table->on('another_table.person_id2', '=', 'my_table.id2');
-        $table->orOn('another_table.age', '>', QB::raw(1));
+        $table->orOn('another_table.age', '>', $qb->raw(1));
     })
 ```
 
 ### Raw Query
 You can always use raw queries if you need,
 ```PHP
-$query = QB::query('select * from cb_my_table where age = 12');
+$query = $qb->query('select * from cb_my_table where age = 12');
 
 var_dump($query->get());
 ```
 
 You can also pass your bindings
 ```PHP
-QB::query('select * from cb_my_table where age = ? and name = ?', array(10, 'usman'));
+$qb->query('select * from cb_my_table where age = ? and name = ?', array(10, 'usman'));
 ```
 
 #### Raw Expressions
 
 When you wrap an expression with `raw()` method, Pixie doesn't try to sanitize these.
 ```PHP
-QB::table('my_table')
-            ->select(QB::raw('count(cb_my_table.id) as tot'))
+$qb->table('my_table')
+            ->select($qb->raw('count(cb_my_table.id) as tot'))
             ->where('value', '=', 'Ifrah')
-            ->where(QB::raw('DATE(?)', 'now'))
+            ->where($qb->raw('DATE(?)', 'now'))
 ```
 
 
@@ -424,7 +407,7 @@ $data = array(
     'name' => 'Sana',
     'description' => 'Blah'
 );
-$insertId = QB::table('my_table')->insert($data);
+$insertId = $qb->table('my_table')->insert($data);
 ```
 
 `insert()` method returns the insert id.
@@ -441,7 +424,7 @@ $data = array(
         'description' => 'Blah'
     ),
 );
-$insertIds = QB::table('my_table')->insert($data);
+$insertIds = $qb->table('my_table')->insert($data);
 ```
 
 In case of batch insert, it will return an array of insert ids.
@@ -456,7 +439,7 @@ $dataUpdate = array(
     'name'    => 'Sana',
     'counter' => 2
 );
-$insertId = QB::table('my_table')->onDuplicateKeyUpdate($dataUpdate)->insert($data);
+$insertId = $qb->table('my_table')->onDuplicateKeyUpdate($dataUpdate)->insert($data);
 ```
 
 ### Update
@@ -466,14 +449,14 @@ $data = array(
     'description' => 'Blah'
 );
 
-QB::table('my_table')->where('id', 5)->update($data);
+$qb->table('my_table')->where('id', 5)->update($data);
 ```
 
 Will update the name field to Sana and description field to Blah where id = 5.
 
 ### Delete
 ```PHP
-QB::table('my_table')->where('id', '>', 5)->delete();
+$qb->table('my_table')->where('id', '>', 5)->delete();
 ```
 Will delete all the rows where id is greater than 5.
 
@@ -487,13 +470,13 @@ are made.
 Here's a basic transaction:
 
 ```PHP
-QB::transaction(function ($qb) {
-    $qb->table('my_table')->insert(array(
+$qb->transaction(function ($qb2) {
+    $qb2->table('my_table')->insert(array(
         'name' => 'Test',
         'url' => 'example.com'
     ));
 
-    $qb->table('my_table')->insert(array(
+    $qb2->table('my_table')->insert(array(
         'name' => 'Test2',
         'url' => 'example.com'
     ));
@@ -508,7 +491,7 @@ If you wish to manually commit or rollback your changes, you can use the
 `commit()` and `rollback()` methods accordingly:
 
 ```PHP
-QB::transaction(function (qb) {
+$qb->transaction(function (qb) {
     $qb->table('my_table')->insert(array(/* data... */));
 
     $qb->commit(); // to commit the changes (data would be saved)
@@ -519,7 +502,7 @@ QB::transaction(function (qb) {
 ### Get Built Query
 Sometimes you may need to get the query string, its possible.
 ```PHP
-$query = QB::table('my_table')->where('id', '=', 3);
+$query = $qb->table('my_table')->where('id', '=', 3);
 $queryObj = $query->getQuery();
 ```
 `getQuery()` will return a query object, from this you can get sql, bindings or raw sql.
@@ -540,17 +523,17 @@ $queryObj->getRawSql();
 ```
 
 ### Sub Queries and Nested Queries
-Rarely but you may need to do sub queries or nested queries. Pixie is powerful enough to do this for you. You can create different query objects and use the `QB::subQuery()` method.
+Rarely but you may need to do sub queries or nested queries. Pixie is powerful enough to do this for you. You can create different query objects and use the `$qb->subQuery()` method.
 
 ```PHP
-$subQuery = QB::table('person_details')->select('details')->where('person_id', '=', 3);
+$subQuery = $qb->table('person_details')->select('details')->where('person_id', '=', 3);
 
 
-$query = QB::table('my_table')
+$query = $qb->table('my_table')
             ->select('my_table.*')
-            ->select(QB::subQuery($subQuery, 'table_alias1'));
+            ->select($qb->subQuery($subQuery, 'table_alias1'));
 
-$nestedQuery = QB::table(QB::subQuery($query, 'table_alias2'))->select('*');
+$nestedQuery = $qb->table($qb->subQuery($query, 'table_alias2'))->select('*');
 $nestedQuery->get();
 ```
 
@@ -564,20 +547,20 @@ This will produce a query like this:
 If you need to get the PDO instance you can do so.
 
 ```PHP
-QB::pdo();
+$qb->pdo();
 ```
 
 ### Fetch results as objects of specified class
 Simply call `asObject` query's method.
 
 ```PHP
-QB::table('my_table')->asObject('SomeClass', array('ctor', 'args'))->first();
+$qb->table('my_table')->asObject('SomeClass', array('ctor', 'args'))->first();
 ```
 
 Furthermore, you may fine-tune fetching mode by calling `setFetchMode` method.
 
 ```PHP
-QB::table('my_table')->setFetchMode(PDO::FETCH_COLUMN|PDO::FETCH_UNIQUE)->get();
+$qb->table('my_table')->setFetchMode(PDO::FETCH_COLUMN|PDO::FETCH_UNIQUE)->get();
 ```
 
 ### Query Events
@@ -599,7 +582,7 @@ Pixie comes with powerful query events to supercharge your application. These ev
 #### Registering Events
 
 ```PHP
-QB::registerEvent('before-select', 'users', function($qb)
+$qb->registerEvent('before-select', 'users', function($qb)
 {
     $qb->where('status', '!=', 'banned');
 });
@@ -614,7 +597,7 @@ If you want the event to be performed when **any table is being queried**, provi
 
 After inserting data into `my_table`, details will be inserted into another table
 ```PHP
-QB::registerEvent('after-insert', 'my_table', function($queryBuilder, $insertId)
+$qb->registerEvent('after-insert', 'my_table', function($queryBuilder, $insertId)
 {
     $data = array('person_id' => $insertId, 'details' => 'Meh', 'age' => 5);
     $queryBuilder->table('person_details')->insert($data);
@@ -623,7 +606,7 @@ QB::registerEvent('after-insert', 'my_table', function($queryBuilder, $insertId)
 
 Whenever data is inserted into `person_details` table, set the timestamp field `created_at`, so we don't have to specify it everywhere:
 ```PHP
-QB::registerEvent('after-insert', 'person_details', function($queryBuilder, $insertId)
+$qb->registerEvent('after-insert', 'person_details', function($queryBuilder, $insertId)
 {
     $queryBuilder->table('person_details')->where('id', $insertId)->update(array('created_at' => date('Y-m-d H:i:s')));
 });
@@ -631,7 +614,7 @@ QB::registerEvent('after-insert', 'person_details', function($queryBuilder, $ins
 
 After deleting from `my_table` delete the relations:
 ```PHP
-QB::registerEvent('after-delete', 'my_table', function($queryBuilder, $queryObject)
+$qb->registerEvent('after-delete', 'my_table', function($queryBuilder, $queryObject)
 {
     $bindings = $queryObject->getBindings();
     $queryBuilder->table('person_details')->where('person_id', $binding[0])->delete();
@@ -653,7 +636,7 @@ Only on `after-*` events you get three parameters: **first** is the query builde
 
 #### Removing Events
 ```PHP
-QB::removeEvent('event-name', 'table-name');
+$qb->removeEvent('event-name', 'table-name');
 ```
 
 #### Some Use Cases
