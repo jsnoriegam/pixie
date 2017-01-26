@@ -140,10 +140,10 @@ class QueryBuilderHandler
         return $this;
     }
 
-    public function addPrefix($table, $prefix) {
-        $this->addStatement('prefixes', [$table => strtolower($prefix)]);
-        return $this;
-    }
+    //public function addPrefix($table, $prefix) {
+    //    $this->addStatement('prefixes', [$table => strtolower($prefix)]);
+    //    return $this;
+    //}
 
     /**
      * @param       $sql
@@ -476,7 +476,7 @@ class QueryBuilderHandler
         }
 
         $instance = new static($this->connection);
-        $tables = $this->addTablePrefix($tables, false);
+        $tables = $this->addTablePrefix($tables);
         $instance->addStatement('tables', $tables);
         return $instance;
     }
@@ -492,7 +492,7 @@ class QueryBuilderHandler
             $tables = func_get_args();
         }
 
-        $tables = $this->addTablePrefix($tables, false);
+        $tables = $this->addTablePrefix($tables);
         $this->addStatement('tables', $tables);
         return $this;
     }
@@ -508,7 +508,7 @@ class QueryBuilderHandler
             $fields = func_get_args();
         }
 
-        $fields = $this->addTablePrefix($fields);
+        $fields = $this->addFieldPrefix($fields);
         $this->addStatement('selects', $fields);
         return $this;
     }
@@ -532,7 +532,7 @@ class QueryBuilderHandler
      */
     public function groupBy($field)
     {
-        $field = $this->addTablePrefix($field);
+        $field = $this->addFieldPrefix($field);
         $this->addStatement('groupBys', $field);
         return $this;
     }
@@ -557,7 +557,7 @@ class QueryBuilderHandler
                 $type = $defaultDirection;
             }
             if (!$field instanceof Raw) {
-                $field = $this->addTablePrefix($field);
+                $field = $this->addFieldPrefix($field);
             }
             $this->statements['orderBys'][] = compact('field', 'type');
         }
@@ -597,7 +597,7 @@ class QueryBuilderHandler
      */
     public function having($key, $operator, $value, $joiner = 'AND')
     {
-        $key = $this->addTablePrefix($key);
+        $key = $this->addFieldPrefix($key);
         $this->statements['havings'][] = compact('key', 'operator', 'value', 'joiner');
         return $this;
     }
@@ -794,7 +794,7 @@ class QueryBuilderHandler
 
     protected function whereNullHandler($key, $prefix = '', $operator = '')
     {
-        $key = $this->adapterInstance->wrapSanitizer($this->addTablePrefix($key));
+        $key = $this->adapterInstance->wrapSanitizer($this->addFieldPrefix($key));
         return $this->{$operator . 'Where'}($this->raw("{$key} IS {$prefix} NULL"));
     }
 
@@ -822,7 +822,7 @@ class QueryBuilderHandler
 
         // Call the closure with our new joinBuilder object
         $key($joinBuilder);
-        $table = $this->addTablePrefix($table, false);
+        $table = $this->addTablePrefix($table);
         // Get the criteria only query from the joinBuilder object
         $this->statements['joins'][] = compact('type', 'table', 'joinBuilder');
 
@@ -955,9 +955,40 @@ class QueryBuilderHandler
      */
     protected function whereHandler($key, $operator = null, $value = null, $joiner = 'AND')
     {
-        $key = $this->addTablePrefix($key);
+        $key = $this->addFieldPrefix($key);
         $this->statements['wheres'][] = compact('key', 'operator', 'value', 'joiner');
         return $this;
+    }
+
+    public function addFieldPrefix($values) {
+        if ($this->tablePrefix === null) {
+            return $values;
+        }
+
+        $single = false;
+        if (!is_array($values)) {
+            $values = [$values];
+            // We had single value, so should return a single value
+            $single = true;
+        }
+
+        $return = [];
+        foreach ($values as $key => $value) {
+            if ($value instanceof Raw || $value instanceof \Closure) {
+                $return[$key] = $value;
+                continue;
+            }
+
+            $target = &$value;
+            if(!is_int($key)) {
+                $target = &$key;
+            }
+            if(strpos($target, '.') !== false) {
+                $target = $this->tablePrefix . $target;
+            }
+            $return[$key] = $value;
+        }
+        return $single ? end($return) : $return;
     }
 
     /**
@@ -968,15 +999,12 @@ class QueryBuilderHandler
      *
      * @return array|string
      */
-    public function addTablePrefix($values, $tableFieldMix = true)
+    public function addTablePrefix($values)
     {
         if ($this->tablePrefix === null) {
             return $values;
         }
 
-        // $value will be an array and we will add prefix to all table names
-
-        // If supplied value is not an array then make it one
         $single = false;
         if (!is_array($values)) {
             $values = [$values];
@@ -985,29 +1013,18 @@ class QueryBuilderHandler
         }
 
         $return = [];
-
         foreach ($values as $key => $value) {
-            // It's a raw query, just add it to our return array and continue next
             if ($value instanceof Raw || $value instanceof \Closure) {
                 $return[$key] = $value;
                 continue;
             }
 
-            // If key is not integer, it is likely a alias mapping,
-            // so we need to change prefix target
-            $target = &$value;
-            if (!is_int($key)) {
-                $target = &$key;
+            if(!is_int($key)) {
+                $return[$this->tablePrefix . $key] = $this->tablePrefix . $value;
+            } else {
+                $return[$key] = $this->tablePrefix . $value;
             }
-
-            if (!$tableFieldMix || ($tableFieldMix && strpos($target, '.') !== false)) {
-                $target = $this->tablePrefix . $target;
-            }
-
-            $return[$key] = $value;
         }
-
-        // If we had single value then we should return a single value (end value of the array)
         return $single ? end($return) : $return;
     }
 
@@ -1047,7 +1064,7 @@ class QueryBuilderHandler
         $table = $table ?: ':any';
 
         if ($table !== ':any') {
-            $table = $this->addTablePrefix($table, false);
+            $table = $this->addTablePrefix($table);
         }
 
         $this->connection->getEventHandler()->registerEvent($event, $table, $action);
@@ -1062,7 +1079,7 @@ class QueryBuilderHandler
     public function removeEvent($event, $table = ':any')
     {
         if ($table !== ':any') {
-            $table = $this->addTablePrefix($table, false);
+            $table = $this->addTablePrefix($table);
         }
 
         $this->connection->getEventHandler()->removeEvent($event, $table);

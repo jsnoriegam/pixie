@@ -41,6 +41,18 @@ class QueryBuilderTest extends TestCase
             $query->getQuery()->getRawSql());
     }
 
+    public function testTableAlias()
+    {
+        $query = $this->builder->table(array('my_table' => 'm'))
+            ->join(array('another_table' => 'a'), 'm.field_1', '=', 'a.field_2')
+            ->select(array('m.field' => 'm_field'));
+
+        $query->get();
+        $this->assertEquals(
+            'SELECT `cb_m`.`field` AS `m_field` FROM `cb_my_table` AS `cb_m` INNER JOIN `cb_another_table` AS `cb_a` ON `cb_m`.`field_1` = `cb_a`.`field_2`',
+            $query->getQuery()->getRawSql());
+    }
+
     public function testSelectQuery()
     {
         $subQuery = $this->builder->table('person_details')->select('details')->where('person_id', '=', 3);

@@ -46,15 +46,17 @@ abstract class BaseAdapter
         if(isset($statements['tables'])) {
             $tables = array();
 
-            foreach($statements['tables'] as $table) {
-                $t = ($table instanceof Raw) ? $table : '`'. $table .'`';
-                if(isset($statements['prefixes'][strtolower($table)])) {
-                    $t .= ' AS ' . $statements['prefixes'][strtolower($table)];
+            foreach($statements['tables'] as $key => $value) {
+                if(is_int($key)) {
+                    if($value instanceof Raw) {
+                        $tables[] = (string) $value;
+                    } else {
+                        $tables[] = $this->wrapSanitizer($value);
+                    }
+                } else {
+                    $tables[] = $this->wrapSanitizer($key) . ' AS ' . $this->wrapSanitizer($value);
                 }
-
-                $tables[] = $t;
             }
-
             $tables = join(',', $tables);
             $fromEnabled = true;
         }
@@ -520,8 +522,14 @@ abstract class BaseAdapter
 
         foreach ($statements['joins'] as $joinArr) {
             if (is_array($joinArr['table'])) {
-                list($mainTable, $aliasTable) = $joinArr['table'];
-                $table = $this->wrapSanitizer($mainTable) . ' AS ' . $this->wrapSanitizer($aliasTable);
+                reset($joinArr['table']);
+                $key = key($joinArr['table']);
+                if(!is_int($key)) {
+                    $table = $this->wrapSanitizer($key) . ' AS ' . $this->wrapSanitizer(current($joinArr['table']));
+                } else {
+                    list($mainTable, $aliasTable) = $joinArr['table'];
+                    $table = $this->wrapSanitizer($mainTable) . ' AS ' . $this->wrapSanitizer($aliasTable);
+                }
             } else {
                 $table = $joinArr['table'] instanceof Raw ?
                     (string) $joinArr['table'] :

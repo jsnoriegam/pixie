@@ -36,8 +36,8 @@ class JoinBuilder extends QueryBuilderHandler
      */
     protected function joinHandler($key, $operator = null, $value = null, $joiner = 'AND')
     {
-        $key = $this->addTablePrefix($key);
-        $value = $this->addTablePrefix($value);
+        $key = $this->addFieldPrefix($key);
+        $value = $this->addFieldPrefix($value);
         $this->statements['criteria'][] = compact('key', 'operator', 'value', 'joiner');
         return $this;
     }
