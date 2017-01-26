@@ -846,20 +846,21 @@ class QueryBuilderHandler
             $transaction = $this->container->build(\Pixie\QueryBuilder\Transaction::class, [$this->connection]);
 
             // Call closure
-            $callback($transaction);
+            $result = $callback($transaction);
+
+            if($transaction->getStatus() !== 'auto') {
+                return $result;
+            }
 
             // If no errors have been thrown or the transaction wasn't completed within
             // the closure, commit the changes
             $this->pdo->commit();
 
-            return $this;
-        } catch (TransactionHaltException $e) {
-            // Commit or rollback behavior has been handled in the closure, so exit
-            return $this;
+            return $result;
         } catch (\Exception $e) {
             // something happened, rollback changes
             $this->pdo->rollBack();
-            return $this;
+            throw $e;
         }
     }
 
