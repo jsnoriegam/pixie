@@ -5,6 +5,7 @@ namespace Pixie\QueryBuilder;
 class Transaction extends QueryBuilderHandler
 {
 
+    protected $status = 'auto';
     /**
      * Commit the database changes
      * @throws TransactionHaltException
@@ -12,7 +13,7 @@ class Transaction extends QueryBuilderHandler
     public function commit()
     {
         $this->pdo->commit();
-        throw new TransactionHaltException();
+        $this->status = 'commited';
     }
 
     /**
@@ -22,6 +23,11 @@ class Transaction extends QueryBuilderHandler
     public function rollback()
     {
         $this->pdo->rollBack();
-        throw new TransactionHaltException();
+        $this->status = 'rolledback';
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
     }
 }
