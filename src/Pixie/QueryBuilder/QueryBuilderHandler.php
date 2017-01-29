@@ -960,6 +960,13 @@ class QueryBuilderHandler
         return $this;
     }
 
+    /**
+     * Add table prefix (if given any). for fields using table.field notation
+     *
+     * @param $values
+     *
+     * @return array|string
+     */
     public function addFieldPrefix($values) {
         if ($this->tablePrefix === null) {
             return $values;
@@ -992,10 +999,10 @@ class QueryBuilderHandler
     }
 
     /**
-     * Add table prefix (if given) on given string.
+     * Add table prefix (if given any).
+     * Prefix is added to table aliases as well
      *
-     * @param      $values
-     * @param bool $tableFieldMix If we have mixes of field and table names with a "."
+     * @param $values
      *
      * @return array|string
      */
