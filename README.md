@@ -70,17 +70,7 @@ There are many advanced options which are documented below. Sold? Let's install.
 
 ## Installation
 
-Pixie uses [Composer](http://getcomposer.org/doc/00-intro.md#installation-nix) to make things easy.
-
-Learn to use composer and add this to require section (in your composer.json):
-
-    "usmanhalalit/pixie": "2.*@dev"
-
-And run:
-
-    composer update
-
-Library on [Packagist](https://packagist.org/packages/usmanhalalit/pixie).
+Not yet
 
 ## Full Usage API
 
@@ -115,7 +105,7 @@ Library on [Packagist](https://packagist.org/packages/usmanhalalit/pixie).
     - [Insert with ON DUPLICATE KEY statement](#insert-with-on-duplicate-key-statement)
  - [**Update**](#update)
  - [**Delete**](#delete)
- - [Transactions](#transactions)
+ - [**Transactions**](#transactions)
  - [Get Built Query](#get-built-query)
  - [Sub Queries and Nested Queries](#sub-queries-and-nested-queries)
  - [Get PDO Instance](#get-pdo-instance)
@@ -268,6 +258,17 @@ $qb->table('my_table')
     ->whereNot('age', '>', 25)
     ->orWhere('type', '=', 'admin')
     ->orWhereNot('description', 'LIKE', '%query%')
+    ;
+```
+
+Using aliases:
+
+```PHP
+$qb->table(['my_table' => 'm'])
+    ->where('m.name', '=', 'usman')
+    ->whereNot('m.age', '>', 25)
+    ->orWhere('m.type', '=', 'admin')
+    ->orWhereNot('m.description', 'LIKE', '%query%')
     ;
 ```
 
