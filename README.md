@@ -70,17 +70,7 @@ There are many advanced options which are documented below. Sold? Let's install.
 
 ## Installation
 
-Pixie uses [Composer](http://getcomposer.org/doc/00-intro.md#installation-nix) to make things easy.
-
-Learn to use composer and add this to require section (in your composer.json):
-
-    "usmanhalalit/pixie": "2.*@dev"
-
-And run:
-
-    composer update
-
-Library on [Packagist](https://packagist.org/packages/usmanhalalit/pixie).
+Not yet
 
 ## Full Usage API
 
@@ -88,7 +78,7 @@ Library on [Packagist](https://packagist.org/packages/usmanhalalit/pixie).
 
  - [Connection](#connection)
     - [Multiple Connection](#alias)
-    - [SQLite and PostgreSQL Config Sample](sqlite-and-postgresql-config-sample)
+    - [SQLite and PostgreSQL Config Sample](#sqlite-and-postgresql-config-sample)
  - [Query](#query)
  - [**Select**](#select)
     - [Get Easily](#get-easily)
@@ -115,7 +105,7 @@ Library on [Packagist](https://packagist.org/packages/usmanhalalit/pixie).
     - [Insert with ON DUPLICATE KEY statement](#insert-with-on-duplicate-key-statement)
  - [**Update**](#update)
  - [**Delete**](#delete)
- - [Transactions](#transactions)
+ - [**Transactions**](#transactions)
  - [Get Built Query](#get-built-query)
  - [Sub Queries and Nested Queries](#sub-queries-and-nested-queries)
  - [Get PDO Instance](#get-pdo-instance)
@@ -271,6 +261,18 @@ $qb->table('my_table')
     ;
 ```
 
+Using aliases:
+
+```PHP
+$qb->table(['my_table' => 'm'])
+    ->where('m.name', '=', 'usman')
+    ->whereNot('m.age', '>', 25)
+    ->orWhere('m.type', '=', 'admin')
+    ->orWhereNot('m.description', 'LIKE', '%query%')
+    ->select(['m.age' => 'my_age', 'm.type' => 'my_type'])
+    ;
+```
+
 
 #### Where In
 ```PHP
@@ -358,6 +360,14 @@ If you need `FULL OUTER` join or any other join, just pass it as 5th parameter o
 ```PHP
 ->join('another_table', 'another_table.person_id', '=', 'my_table.id', 'FULL OUTER')
 ```
+
+For aliases use the same sintax of **select()** and **table()**
+```PHP
+$qb->table(['my_table' => 'm'])
+    ->join(['another_table' => 'a'], 'a.person_id', '=', 'm.id')
+
+```
+*Only the first item on the array is used*
 
 #### Multiple Join Criteria
 If you need more than one criterion to join a table then pass a closure as second parameter.
@@ -657,4 +667,4 @@ Here are some cases where Query Events can be extremely helpful:
 ___
 If you find any typo then please edit and send a pull request.
 
-&copy; 2016 [Muhammad Usman](http://usman.it/). Licensed under MIT license.
+&copy; 2016 [Juan Noriega](http://latinosoft.co/). Licensed under MIT license.

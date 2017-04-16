@@ -70,6 +70,12 @@ class QueryObject
 
         # build a regular expression for each parameter
         foreach ($params as $key => $value) {
+            if($value instanceof QueryBuilderHandler) {
+                $keys[] = '/[?]/';
+                $values[$key] = '(' . $value->getQuery()->getRawSql() . ')';
+                continue;
+            }
+
             if (is_string($key)) {
                 $keys[] = '/:' . $key . '/';
             } else {

@@ -88,8 +88,8 @@ class QueryBuilder extends TestCase
     }
 
     public function testFalseBoolWhere() {
-        $result = $this->builder->table('test')->where('id', '=', false);
-        $this->assertEquals('SELECT * FROM `cb_test` WHERE `id` = 0', $result->getQuery('select')->getRawSql());
+        $result = $this->builder->table('test')->where('field', '=', false);
+        $this->assertEquals('SELECT * FROM `cb_test` WHERE `field` = 0', $result->getQuery('select')->getRawSql());
     }
 
 }
