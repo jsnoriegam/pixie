@@ -1,6 +1,6 @@
 {
   "name": "latinosoft/pixie",
-  "version": "2.0",
+  "version": "2.0.10-rc1",
   "description": "A lightweight, expressive, framework agnostic query builder for PHP. Personal fork.",
   "homepage": "https://github.com/jsnoriegam/pixie",
   "keywords": [
