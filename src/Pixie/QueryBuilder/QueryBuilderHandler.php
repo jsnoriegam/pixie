@@ -178,11 +178,11 @@ class QueryBuilderHandler
      */
     public function get()
     {
-        if(!$this->isCount) {
+        if(!$this->isCount) {//we ignore events inside count()
             $eventResult = $this->fireEvents('before-select');
-        }
-        if ($eventResult !== null) {
-            return $eventResult;
+            if ($eventResult !== null) {
+                return $eventResult;
+            }
         }
 
         $executionTime = 0;
