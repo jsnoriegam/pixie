@@ -284,7 +284,7 @@ class QueryBuilderHandler
             if (is_array($row[0])) {
                 return (int)$row[0]['__field__'];
             } elseif (is_object($row[0])) {
-                return (int)$row[0]->field;
+                return (int)$row[0]->__field__;
             }
         }
 
