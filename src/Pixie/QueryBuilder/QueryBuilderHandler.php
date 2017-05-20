@@ -60,6 +60,11 @@ class QueryBuilderHandler
     protected $lastData;
 
     /**
+     * @var boolean
+     */
+    protected $isCount = false;
+
+    /**
      * @param null|\Pixie\Connection $connection
      *
      * @throws \Pixie\Exception
@@ -173,7 +178,9 @@ class QueryBuilderHandler
      */
     public function get()
     {
-        $eventResult = $this->fireEvents('before-select');
+        if(!$this->isCount) {
+            $eventResult = $this->fireEvents('before-select');
+        }
         if ($eventResult !== null) {
             return $eventResult;
         }
@@ -191,7 +198,9 @@ class QueryBuilderHandler
         $result = call_user_func_array(array($this->pdoStatement, 'fetchAll'), $this->fetchParameters);
         $executionTime += microtime(true) - $start;
         $this->pdoStatement = null;
-        $this->fireEvents('after-select', $result, $executionTime);
+        if(!$this->isCount) {
+            $this->fireEvents('after-select', $result, $executionTime);
+        }
         return $result;
     }
 
@@ -243,7 +252,9 @@ class QueryBuilderHandler
 
         unset($this->statements['orderBys'], $this->statements['limit'], $this->statements['offset']);
 
+        $this->isCount = true;
         $count = $this->aggregate('count');
+        $this->isCount = false;
         $this->statements = $originalStatements;
 
         return $count;
@@ -259,7 +270,7 @@ class QueryBuilderHandler
         // Get the current selects
         $mainSelects = isset($this->statements['selects']) ? $this->statements['selects'] : null;
         // Replace select with a scalar value like `count`
-        $this->statements['selects'] = [$this->raw($type . '(*) as field')];
+        $this->statements['selects'] = [$this->raw($type . '(*) as __field__')];
         $row = $this->get();
 
         // Set the select as it was
@@ -271,7 +282,7 @@ class QueryBuilderHandler
 
         if(isset($row[0])) {
             if (is_array($row[0])) {
-                return (int)$row[0]['field'];
+                return (int)$row[0]['__field__'];
             } elseif (is_object($row[0])) {
                 return (int)$row[0]->field;
             }
