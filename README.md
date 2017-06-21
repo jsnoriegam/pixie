@@ -77,7 +77,6 @@ Not yet
 ### Table of Contents
 
  - [Connection](#connection)
-    - [Multiple Connection](#alias)
     - [SQLite and PostgreSQL Config Sample](#sqlite-and-postgresql-config-sample)
  - [Query](#query)
  - [**Select**](#select)
