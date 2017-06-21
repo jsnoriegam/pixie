@@ -1,6 +1,6 @@
 {
   "name": "latinosoft/pixie",
-  "version": "2.0.10-rc1",
+  "version": "2.0.10-rc3",
   "description": "A lightweight, expressive, framework agnostic query builder for PHP. Personal fork.",
   "homepage": "https://github.com/jsnoriegam/pixie",
   "keywords": [
@@ -30,12 +30,12 @@
     },
     {
       "name": "Juan Noriega",
-      "email": "jsnoriegam@hotmail.com",
+      "email": "jsnoriegam@latinosoft.co",
       "role": "Developer"
     }
   ],
   "require": {
-    "php": ">=5.5.0"
+    "php": ">=5.6.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.7",
