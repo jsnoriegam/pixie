@@ -60,6 +60,11 @@ class QueryBuilderHandler
     protected $lastData;
 
     /**
+     * @var null|QueryObject
+     */
+    protected $lastQuery;
+    
+    /**
      * @var boolean
      */
     protected $isCount = false;
@@ -180,6 +185,7 @@ class QueryBuilderHandler
     {
         if(!$this->isCount) {//we ignore events inside count()
             $eventResult = $this->fireEvents('before-select');
+            //
             if ($eventResult !== null) {
                 return $eventResult;
             }
@@ -270,7 +276,8 @@ class QueryBuilderHandler
         // Get the current selects
         $mainSelects = isset($this->statements['selects']) ? $this->statements['selects'] : null;
         // Replace select with a scalar value like `count`
-        $this->statements['selects'] = [$this->raw($type . '(*) as __field__')];
+        $field = '__' . $type .  '__';
+        $this->statements['selects'] = [$this->raw($type . '(*) as ' . $field)];
         $row = $this->get();
 
         // Set the select as it was
@@ -282,9 +289,9 @@ class QueryBuilderHandler
 
         if(isset($row[0])) {
             if (is_array($row[0])) {
-                return (int)$row[0]['__field__'];
+                return (int)$row[0][$field];
             } elseif (is_object($row[0])) {
-                return (int)$row[0]->__field__;
+                return (int)$row[0]->$field;
             }
         }
 
@@ -317,10 +324,11 @@ class QueryBuilderHandler
         $this->lastAction = $action;
         $this->lastData = in_array($action, ['select', 'delete']) ? null : $data;
         
-        return $this->container->build(
+        $this->lastQuery = $queryObject = $this->container->build(
             '\Pixie\QueryBuilder\QueryObject',
             [$queryArr['sql'], $queryArr['bindings'], $this->pdo]
         );
+        return $queryObject;
     }
 
     /**
@@ -1120,5 +1128,9 @@ class QueryBuilderHandler
     public function getStatements()
     {
         return $this->statements;
+    }
+    
+    public function getLastQuery() {
+        return $this->lastQuery;
     }
 }
