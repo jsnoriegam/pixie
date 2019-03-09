@@ -328,4 +328,12 @@ class QueryBuilderTest extends TestCase
             $query->getQuery('select')->getRawSql()
         );
     }
+    
+    public function testCountQuery() {
+        $count = $this->builder->from($this->builder->subQuery($this->builder->table('my_table'), 'q1'))->count();
+        $this->assertEquals(
+            "SELECT count(*) as __count__ FROM (SELECT * FROM `cb_my_table`) as q1",
+            $this->builder->getLastQuery()->getRawSql()
+        ); 
+    }
 }
