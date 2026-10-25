@@ -1,6 +1,9 @@
 # Pixie Query Builder [![Build Status](https://travis-ci.org/jsnoriegam/pixie.svg?branch=master)](https://travis-ci.org/jsnoriegam/pixie)
 A lightweight, expressive, framework agnostic query builder for PHP it can also be referred as a Database Abstraction Layer. Pixie supports MySQL, SQLite and PostgreSQL and it takes care of query sanitization, table prefixing and many other things with a unified API. At least PHP 5.6 is required.
 
+# PROJECT MOVED
+https://github.com/skipperbent/pecee-pixie
+
 ## NOTE
 This forked version aims to deploy pull-requests and fix bugs quicker.
 
