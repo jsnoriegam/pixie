@@ -38,6 +38,19 @@ class QueryBuilderHandler
     protected $tablePrefix;
 
     /**
+     * Adaptador y su configuración (declaradas para PHP 8.2+: las asigna el
+     * constructor y no deben ser propiedades dinámicas).
+     *
+     * @var null|string
+     */
+    protected $adapter;
+
+    /**
+     * @var array
+     */
+    protected $adapterConfig = [];
+
+    /**
      * @var \Pixie\QueryBuilder\Adapters\BaseAdapter
      */
     protected $adapterInstance;
